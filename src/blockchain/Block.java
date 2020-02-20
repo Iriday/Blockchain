@@ -19,6 +19,6 @@ public class Block {
         sb.append(id);
         sb.append(timeStamp);
         sb.append(hashOfPrev);
-        return "";
+        return Utils.applySHA256(sb.toString());
     }
 }
