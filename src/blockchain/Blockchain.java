@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 public class Blockchain {
     private ArrayList<Block> blocks;
+    private ArrayList<String> hashes;
 
     public void initialize(int numOfBlocks) { // createChain
         blocks = new ArrayList<>(numOfBlocks);
+        hashes = new ArrayList<>(numOfBlocks);
 
         Block prevBlock = null;
         Block thisBlock;
@@ -20,8 +22,21 @@ public class Blockchain {
             }
 
             blocks.add(thisBlock);
+            hashes.add(thisBlock.hashOfThis);
             prevBlock = thisBlock;
         }
+    }
+
+    public boolean isBlockchainHacked() {
+        return !isBlockchainValid(blocks, hashes);
+    }
+
+    private static boolean isBlockchainValid(ArrayList<Block> blocks, ArrayList<String> hashes) {
+        for (int i = 0; i < hashes.size(); i++) {
+            if (!hashes.get(i).equals(blocks.get(i).hashOfThis))
+                return false;
+        }
+        return true;
     }
 
     private static Block createBlock(String hashOfPrev) {
