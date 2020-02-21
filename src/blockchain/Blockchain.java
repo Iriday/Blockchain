@@ -51,6 +51,8 @@ public class Blockchain {
             sb.append(block.id);
             sb.append("\nTimestamp: ");
             sb.append(block.timeStamp);
+            sb.append("\nMagic number: ");
+            sb.append(block.magicNumber);
             sb.append("\nHash of the previous block:\n");
             sb.append(block.hashOfPrev);
             sb.append("\nHash of the block:\n");
