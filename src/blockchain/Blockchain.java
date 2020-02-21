@@ -6,7 +6,7 @@ public class Blockchain {
     private ArrayList<Block> blocks;
     private ArrayList<String> hashes;
 
-    public void initialize(int numOfBlocks) { // createChain
+    public void initialize(int numOfBlocks, int numOfZeros) { // createChain
         blocks = new ArrayList<>(numOfBlocks);
         hashes = new ArrayList<>(numOfBlocks);
 
@@ -16,9 +16,9 @@ public class Blockchain {
         for (int i = 0; i < numOfBlocks; i++) {
 
             if (i == 0) {
-                thisBlock = createBlock("0");
+                thisBlock = createBlock("0", numOfZeros);
             } else {
-                thisBlock = createBlock(prevBlock.hashOfThis);
+                thisBlock = createBlock(prevBlock.hashOfThis, numOfZeros);
             }
 
             blocks.add(thisBlock);
@@ -39,8 +39,8 @@ public class Blockchain {
         return true;
     }
 
-    private static Block createBlock(String hashOfPrev) {
-        return new Block(hashOfPrev);
+    private static Block createBlock(String hashOfPrev, int numOfZeros) {
+        return new Block(hashOfPrev, numOfZeros);
     }
 
     public String toString() {
@@ -52,7 +52,7 @@ public class Blockchain {
             sb.append("\nTimestamp: ");
             sb.append(block.timeStamp);
             sb.append("\nMagic number: ");
-            sb.append(block.magicNumber);
+            sb.append(block.getMagicNumber());
             sb.append("\nHash of the previous block:\n");
             sb.append(block.hashOfPrev);
             sb.append("\nHash of the block:\n");

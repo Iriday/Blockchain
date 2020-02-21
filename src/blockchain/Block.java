@@ -9,22 +9,34 @@ public class Block {
     public final long timeStamp;
     public final String hashOfPrev;
     public final String hashOfThis;
-    public final int magicNumber;
+    private int magicNumber;
 
-    public Block(String hashOfPrev) {
+    public Block(String hashOfPrev, int numOfZeros) {
         timeStamp = System.currentTimeMillis();
         this.hashOfPrev = hashOfPrev;
         magicNumber = random.nextInt();
-        hashOfThis = createHash();
+        hashOfThis = createHash(numOfZeros);
     }
 
-    private String createHash() {
+    private String createHash(int numOfZeros) {
+        if (numOfZeros < 0) throw new IllegalArgumentException();
+
         var sb = new StringBuilder();
         sb.append(ids);
         sb.append(id);
         sb.append(timeStamp);
         sb.append(hashOfPrev);
-        sb.append(magicNumber);
-        return Utils.applySHA256(sb.toString());
+
+        String hash;
+        do {
+            magicNumber = random.nextInt();
+            hash = Utils.applySHA256(sb.toString() + magicNumber);
+        } while (!Utils.startsWithZeros(hash, numOfZeros));
+
+        return hash;
+    }
+
+    public int getMagicNumber() {
+        return magicNumber;
     }
 }
