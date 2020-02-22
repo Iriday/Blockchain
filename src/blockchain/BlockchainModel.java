@@ -1,12 +1,15 @@
 package blockchain;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Blockchain {
-    private ArrayList<Block> blocks;
-    private ArrayList<String> hashes;
+public class BlockchainModel implements BlockchainModelInterface {
+    private List<Block> blocks;
+    private List<String> hashes;
+    private final List<Observer> observers = new ArrayList<>();
 
-    public void initialize(int numOfBlocks, int numOfZeros) { // createChain
+    @Override
+    public void run(int numOfBlocks, int numOfZeros) { // createChain
         blocks = new ArrayList<>(numOfBlocks);
         hashes = new ArrayList<>(numOfBlocks);
 
@@ -25,13 +28,15 @@ public class Blockchain {
             hashes.add(thisBlock.hashOfThis);
             prevBlock = thisBlock;
         }
+        notifyObservers();
     }
 
+    @Override
     public boolean isBlockchainHacked() {
         return !isBlockchainValid(blocks, hashes);
     }
 
-    private static boolean isBlockchainValid(ArrayList<Block> blocks, ArrayList<String> hashes) {
+    private static boolean isBlockchainValid(List<Block> blocks, List<String> hashes) {
         for (int i = 0; i < hashes.size(); i++) {
             if (!hashes.get(i).equals(blocks.get(i).hashOfThis))
                 return false;
@@ -60,5 +65,20 @@ public class Blockchain {
             sb.append("\n\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        observers.forEach(obr -> obr.update());
     }
 }
