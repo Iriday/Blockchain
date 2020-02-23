@@ -38,7 +38,7 @@ public class ViewConsole implements Observer {
     }
 
     @Override
-    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis) {
+    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime) {
         var sb = new StringBuilder();
 
         sb.append("\nBlock:\nId: ");
@@ -51,6 +51,9 @@ public class ViewConsole implements Observer {
         sb.append(hashOfPrev);
         sb.append("\nHash of the block:\n");
         sb.append(hashOfThis);
+        sb.append("\nBlock was generating for ");
+        sb.append(blockTime / 1000.0);
+        sb.append(" seconds");
 
         output(sb.toString());
     }
