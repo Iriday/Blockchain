@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class ViewConsole implements Observer {
     private final Controller controller;
     private final BlockchainModelInterface model;
+    private int blockCounter = 0;
 
     public ViewConsole(Controller controller, BlockchainModelInterface model) {
         this.controller = controller;
@@ -24,19 +25,33 @@ public class ViewConsole implements Observer {
                 System.out.println("Incorrect input, number should be >=0 && <=64");
                 continue;
             }
-            System.out.println();
             break;
         }
         return input;
     }
 
-    private void output() {
-        System.out.println(model);
-        System.out.println(model.isBlockchainHacked() ? "Wow, that's unbelievable! The blockchain is HACKED!" : "The blockchain is not hacked.");
+    private void output(String data) {
+        System.out.println(data);
+        if (++blockCounter != 5) return;
+
+        System.out.println(model.isBlockchainHacked() ? "\nWow, that's unbelievable! The blockchain is HACKED!" : "\nThe blockchain is not hacked.");
     }
 
     @Override
-    public void update() {
-        output();
+    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis) {
+        var sb = new StringBuilder();
+
+        sb.append("\nBlock:\nId: ");
+        sb.append(blockId);
+        sb.append("\nTimestamp: ");
+        sb.append(timestamp);
+        sb.append("\nMagic number: ");
+        sb.append(magicNumber);
+        sb.append("\nHash of the previous block:\n");
+        sb.append(hashOfPrev);
+        sb.append("\nHash of the block:\n");
+        sb.append(hashOfThis);
+
+        output(sb.toString());
     }
 }

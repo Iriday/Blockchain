@@ -1,5 +1,5 @@
 package blockchain;
 
 public interface Observer {
-    void update();
+    void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis);
 }

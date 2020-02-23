@@ -8,16 +8,15 @@ public class BlockchainModel implements BlockchainModelInterface {
     private List<String> hashes;
     private final List<Observer> observers = new ArrayList<>();
 
+    private Block prevBlock;
+    private Block thisBlock;
+
     @Override
     public void run(int numOfBlocks, int numOfZeros) { // createChain
         blocks = new ArrayList<>(numOfBlocks);
         hashes = new ArrayList<>(numOfBlocks);
 
-        Block prevBlock = null;
-        Block thisBlock;
-
         for (int i = 0; i < numOfBlocks; i++) {
-
             if (i == 0) {
                 thisBlock = createBlock("0", numOfZeros);
             } else {
@@ -27,8 +26,8 @@ public class BlockchainModel implements BlockchainModelInterface {
             blocks.add(thisBlock);
             hashes.add(thisBlock.hashOfThis);
             prevBlock = thisBlock;
+            notifyObservers();
         }
-        notifyObservers();
     }
 
     @Override
@@ -79,6 +78,6 @@ public class BlockchainModel implements BlockchainModelInterface {
 
     @Override
     public void notifyObservers() {
-        observers.forEach(obr -> obr.update());
+        observers.forEach(obr -> obr.update(thisBlock.id, thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis));
     }
 }
