@@ -104,5 +104,8 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     private void readObject(ObjectInputStream ois) throws Exception {
         ois.defaultReadObject();
         observers = new ArrayList<>();
+        if (isBlockchainHacked()) {
+            throw new RuntimeException("Block hash does NOT match");
+        }
     }
 }
