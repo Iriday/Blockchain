@@ -5,13 +5,12 @@ import java.util.Scanner;
 public class ViewConsole implements Observer {
     private final Controller controller;
     private final BlockchainModelInterface model;
-    private int blockCounter = 0;
+    private long blockId = 0;
 
     public ViewConsole(Controller controller, BlockchainModelInterface model) {
         this.controller = controller;
         this.model = model;
         model.registerObserver(this);
-        controller.start(input());
     }
 
     int input() {
@@ -32,7 +31,7 @@ public class ViewConsole implements Observer {
 
     private void output(String data) {
         System.out.println(data);
-        if (++blockCounter != 5) return;
+        if (blockId % 10 != 0) return;
 
         System.out.println(model.isBlockchainHacked() ? "\nWow, that's unbelievable! The blockchain is HACKED!" : "\nThe blockchain is not hacked.");
     }
@@ -55,6 +54,7 @@ public class ViewConsole implements Observer {
         sb.append(blockTime / 1000.0);
         sb.append(" seconds");
 
+        this.blockId = blockId;
         output(sb.toString());
     }
 }

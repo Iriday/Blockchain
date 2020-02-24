@@ -1,7 +1,10 @@
 package blockchain;
 
 public interface BlockchainModelInterface {
-    void run(int numOfBlocks, int numOfZeros);
+
+    void initialize(int numOfBlocks, int numOfZeros);
+
+    void run();
 
     boolean isBlockchainHacked();
 

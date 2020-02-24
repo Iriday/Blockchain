@@ -1,10 +1,13 @@
 package blockchain;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Random;
 
-public class Block {
+public class Block implements Serializable {
     private static final Random random = new Random();
-    private static int ids = 0;
+    private static long ids = 0;
     public final long id = ++ids;
     public final long timeStamp;
     public final String hashOfPrev;
@@ -38,5 +41,15 @@ public class Block {
 
     public int getMagicNumber() {
         return magicNumber;
+    }
+
+    private void writeObject(ObjectOutputStream oos) throws Exception {
+        oos.defaultWriteObject();
+        oos.writeObject(ids);
+    }
+
+    private void readObject(ObjectInputStream ois) throws Exception {
+        ois.defaultReadObject();
+        ids = (long) ois.readObject();
     }
 }

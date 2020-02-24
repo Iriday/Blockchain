@@ -1,15 +1,24 @@
 package blockchain;
 
 public class Controller {
-    private final BlockchainModelInterface model;
-    private final ViewConsole view;
+    private BlockchainModelInterface model;
+    private ViewConsole view;
 
     public Controller(BlockchainModelInterface model) {
-        this.model = model;
-        view = new ViewConsole(this, model);
+
+        try {
+            this.model = (BlockchainModelInterface) SerializationUtils.deserialize("src/blockchain/data.txt");
+            view = new ViewConsole(this, this.model);
+            this.model.run();
+        } catch (Exception e) {
+            this.model = model;
+            view = new ViewConsole(this, model);
+            model.initialize(5, view.input());
+            start();
+        }
     }
 
-    public void start(int input) {
-        model.run(5, input);
+    private void start() {
+        model.run();
     }
 }
