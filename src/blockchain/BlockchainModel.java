@@ -9,45 +9,34 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     private List<Block> blocks;
     private List<String> hashes;
     private transient List<Observer> observers = new ArrayList<>();
-    private int numOfBlocks, numOfZeros;
 
-    private Block prevBlock;
+    private int numOfZeros;
+    private String hashOfPrev = "0";
     private Block thisBlock;
     private long blockTime;
 
     @Override
-    public void initialize(int numOfBlocks, int numOfZeros) {
-        this.numOfBlocks = numOfBlocks;
+    public void initialize(int numOfZeros) {
         this.numOfZeros = numOfZeros;
-        blocks = new ArrayList<>(numOfBlocks);
-        hashes = new ArrayList<>(numOfBlocks);
+        blocks = new ArrayList<>();
+        hashes = new ArrayList<>();
     }
 
     @Override
-    public void run() { // createChain
-        long startTime;
+    public void receiveNextBlock(Block block, long blockTime) {
+        this.thisBlock = block;
+        this.blockTime = blockTime;
 
-        for (int i = 0; i < numOfBlocks; i++) {
-            if (prevBlock == null) { // if first block hashOfPrev=0
-                startTime = System.currentTimeMillis();
-                thisBlock = createBlock("0", numOfZeros);
-                blockTime = System.currentTimeMillis() - startTime;
-            } else {
-                startTime = System.currentTimeMillis();
-                thisBlock = createBlock(prevBlock.hashOfThis, numOfZeros);
-                blockTime = System.currentTimeMillis() - startTime;
-            }
+        blocks.add(thisBlock);
+        hashes.add(thisBlock.hashOfThis);
+        hashOfPrev = thisBlock.hashOfThis;
 
-            blocks.add(thisBlock);
-            hashes.add(thisBlock.hashOfThis);
-            prevBlock = thisBlock;
-            try {
-                SerializationUtils.serialize(this, "src/blockchain/data.txt");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            notifyObservers();
+        try {
+            SerializationUtils.serialize(this, "src/blockchain/data.txt");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+        notifyObservers();
     }
 
     @Override
@@ -61,10 +50,6 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
                 return false;
         }
         return true;
-    }
-
-    private static Block createBlock(String hashOfPrev, int numOfZeros) {
-        return new Block(hashOfPrev, numOfZeros);
     }
 
     public String toString() {
@@ -107,5 +92,15 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
         if (isBlockchainHacked()) {
             throw new RuntimeException("Block hash does NOT match");
         }
+    }
+
+    @Override
+    public int getNumOfZeros() {
+        return numOfZeros;
+    }
+
+    @Override
+    public String getHashOfPrev() {
+        return hashOfPrev;
     }
 }
