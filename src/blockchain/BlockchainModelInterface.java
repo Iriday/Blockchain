@@ -4,7 +4,7 @@ public interface BlockchainModelInterface {
 
     void initialize(int numOfZeros);
 
-    void receiveNextBlock(Block block, long creationTime);
+    boolean receiveNextBlock(Block block, long blockTime);
 
     int getNumOfZeros();
 

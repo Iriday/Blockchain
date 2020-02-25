@@ -23,7 +23,9 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     }
 
     @Override
-    public void receiveNextBlock(Block block, long blockTime) {
+    public boolean receiveNextBlock(Block block, long blockTime) {
+        if (!isBlockValid(block)) return false;
+
         this.thisBlock = block;
         this.blockTime = blockTime;
 
@@ -37,6 +39,11 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
             throw new RuntimeException(e);
         }
         notifyObservers();
+        return true;
+    }
+
+    private boolean isBlockValid(Block block) {
+        return Utils.startsWithZeros(block.hashOfThis, numOfZeros) && hashOfPrev.equals(block.hashOfPrev);
     }
 
     @Override
