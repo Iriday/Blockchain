@@ -24,7 +24,7 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     }
 
     @Override
-    public boolean receiveNextBlock(Block block, long blockTime) {
+    public synchronized boolean receiveNextBlock(Block block, long blockTime) {
         if (!isBlockValid(block)) return false;
 
         try {

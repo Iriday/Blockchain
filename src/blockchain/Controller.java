@@ -1,5 +1,8 @@
 package blockchain;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class Controller {
     private BlockchainModelInterface model;
     private ViewConsole view;
@@ -18,6 +21,10 @@ public class Controller {
     }
 
     private void start() {
-        Miner miner = new Miner(model, 5);
+        ExecutorService executor = Executors.newCachedThreadPool();
+        for (int i = 0; i < 15; i++) {
+            executor.submit(() -> new Miner(model, 10));
+        }
+        executor.shutdown();
     }
 }
