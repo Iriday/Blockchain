@@ -11,8 +11,9 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     private transient List<Observer> observers = new ArrayList<>();
 
     private long idCounter = 0;
-    private int numOfZeros =0;
+    private int numOfZeros = 0;
     private boolean regulateNumOfZeros = false;
+    private int numOfZerosChange = Integer.MAX_VALUE;
     private String hashOfPrev = "0";
     private Block thisBlock;
     private long blockTime;
@@ -49,7 +50,11 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
         hashes.add(thisBlock.hashOfThis);
         hashOfPrev = thisBlock.hashOfThis;
 
-        if (regulateNumOfZeros) numOfZeros = adjustNumOfZeros(numOfZeros, blockTime);
+        if (regulateNumOfZeros) {
+            int newNumOfZeros = adjustNumOfZeros(numOfZeros, blockTime);
+            numOfZerosChange = newNumOfZeros - numOfZeros; // -1, 0, or 1
+            numOfZeros = newNumOfZeros;
+        }
 
         try {
             SerializationUtils.serialize(this, "src/blockchain/data.txt");
@@ -118,7 +123,8 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
 
     @Override
     public void notifyObservers() {
-        observers.forEach(obr -> obr.update(thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, minerId));
+        observers.forEach(obr -> obr.update(
+                thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, minerId, numOfZeros, numOfZerosChange));
     }
 
     private void readObject(ObjectInputStream ois) throws Exception {

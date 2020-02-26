@@ -20,7 +20,7 @@ public class ViewConsole implements Observer {
         while (true) {
             System.out.print("Enter how many zeros the hash must start with or -1(autoregulation): ");
             input = scn.nextInt();
-            if ( input > 64) {
+            if (input > 64) {
                 System.out.println("Incorrect input, value should be <=64");
                 continue;
             }
@@ -37,11 +37,10 @@ public class ViewConsole implements Observer {
     }
 
     @Override
-    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime,long minerId) {
+    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime, long minerId, int numOfZeros, int numOfZerosChange) {
         var sb = new StringBuilder();
 
-        sb.append("\nBlock:");
-        sb.append("\nCreated by miner # ");
+        sb.append("\nBlock:\nCreated by miner # ");
         sb.append(minerId);
         sb.append("\nId: ");
         sb.append(blockId);
@@ -56,6 +55,18 @@ public class ViewConsole implements Observer {
         sb.append("\nBlock was generating for ");
         sb.append(blockTime / 1000.0);
         sb.append(" seconds");
+
+        if (numOfZerosChange != Integer.MAX_VALUE) {
+            if (numOfZerosChange == 0) {
+                sb.append("\nN stays the same");
+            } else if (numOfZerosChange < 0) {
+                sb.append("\nN was decreased to ");
+                sb.append(numOfZeros);
+            } else {
+                sb.append("\nN was increased to ");
+                sb.append(numOfZeros);
+            }
+        }
 
         this.blockId = blockId;
         output(sb.toString());
