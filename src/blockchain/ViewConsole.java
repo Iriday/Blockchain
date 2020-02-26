@@ -18,10 +18,10 @@ public class ViewConsole implements Observer {
         int input;
 
         while (true) {
-            System.out.print("Enter how many zeros the hash must start with: ");
+            System.out.print("Enter how many zeros the hash must start with or -1(autoregulation): ");
             input = scn.nextInt();
-            if (input < 0 || input > 64) {
-                System.out.println("Incorrect input, number should be >=0 && <=64");
+            if ( input > 64) {
+                System.out.println("Incorrect input, value should be <=64");
                 continue;
             }
             break;

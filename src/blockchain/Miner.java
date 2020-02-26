@@ -16,11 +16,12 @@ public class Miner {
         long startTime;
         Block thisBlock;
         long endTime;
-        int numOfZeros = blockchain.getNumOfZeros();
+        int numOfZeros;
         String hashOfPrev;
 
         for (int i = 0; i < numOfBlocks; i++) {
             hashOfPrev = blockchain.getHashOfPrev();
+            numOfZeros = blockchain.getNumOfZeros();
 
             startTime = System.currentTimeMillis();
             thisBlock = createBlock(hashOfPrev, numOfZeros);

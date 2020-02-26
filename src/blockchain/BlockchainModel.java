@@ -11,7 +11,8 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     private transient List<Observer> observers = new ArrayList<>();
 
     private long idCounter = 0;
-    private int numOfZeros;
+    private int numOfZeros =0;
+    private boolean regulateNumOfZeros = false;
     private String hashOfPrev = "0";
     private Block thisBlock;
     private long blockTime;
@@ -19,7 +20,12 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
 
     @Override
     public void initialize(int numOfZeros) {
-        this.numOfZeros = numOfZeros;
+        if (numOfZeros < 0) {
+            regulateNumOfZeros = true;
+        } else {
+            this.numOfZeros = numOfZeros;
+        }
+
         blocks = new ArrayList<>();
         hashes = new ArrayList<>();
     }
@@ -42,6 +48,8 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
         blocks.add(thisBlock);
         hashes.add(thisBlock.hashOfThis);
         hashOfPrev = thisBlock.hashOfThis;
+
+        if (regulateNumOfZeros) numOfZeros = adjustNumOfZeros(numOfZeros, blockTime);
 
         try {
             SerializationUtils.serialize(this, "src/blockchain/data.txt");
@@ -67,6 +75,16 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
                 return false;
         }
         return true;
+    }
+
+    private int adjustNumOfZeros(int numOfZeros, long blockTimeMillis) {
+        if (numOfZeros < 0 || blockTimeMillis < 0) throw new IllegalArgumentException();
+        if (blockTimeMillis == 0) return ++numOfZeros;
+
+        double seconds = blockTimeMillis / 1000.0;
+        if (seconds < 2) return ++numOfZeros;
+        if (seconds < 7) return numOfZeros;
+        else return --numOfZeros; // >=7
     }
 
     public String toString() {
