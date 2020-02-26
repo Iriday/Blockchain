@@ -15,6 +15,7 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     private String hashOfPrev = "0";
     private Block thisBlock;
     private long blockTime;
+    private long minerId;
 
     @Override
     public void initialize(int numOfZeros) {
@@ -24,7 +25,7 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     }
 
     @Override
-    public synchronized boolean receiveNextBlock(Block block, long blockTime) {
+    public synchronized boolean receiveNextBlock(Block block, long blockTime, long minerId) {
         if (!isBlockValid(block)) return false;
 
         try {
@@ -36,6 +37,7 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
 
         this.thisBlock = block;
         this.blockTime = blockTime;
+        this.minerId = minerId;
 
         blocks.add(thisBlock);
         hashes.add(thisBlock.hashOfThis);
@@ -98,7 +100,7 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
 
     @Override
     public void notifyObservers() {
-        observers.forEach(obr -> obr.update(thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime));
+        observers.forEach(obr -> obr.update(thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, minerId));
     }
 
     private void readObject(ObjectInputStream ois) throws Exception {

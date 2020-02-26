@@ -3,6 +3,8 @@ package blockchain;
 public class Miner {
     private final BlockchainModelInterface blockchain;
     private final long numOfBlocks;
+    private static long ids = 0;
+    public final long id = ++ids;
 
     public Miner(BlockchainModelInterface blockchain, long numOfBlocks) {
         this.blockchain = blockchain;
@@ -33,6 +35,6 @@ public class Miner {
     }
 
     private void sendBlock(Block block, long blockTime) {
-        blockchain.receiveNextBlock(block, blockTime);
+        blockchain.receiveNextBlock(block, blockTime, id);
     }
 }

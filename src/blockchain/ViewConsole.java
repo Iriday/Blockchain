@@ -37,10 +37,13 @@ public class ViewConsole implements Observer {
     }
 
     @Override
-    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime) {
+    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime,long minerId) {
         var sb = new StringBuilder();
 
-        sb.append("\nBlock:\nId: ");
+        sb.append("\nBlock:");
+        sb.append("\nCreated by miner # ");
+        sb.append(minerId);
+        sb.append("\nId: ");
         sb.append(blockId);
         sb.append("\nTimestamp: ");
         sb.append(timestamp);
