@@ -10,6 +10,7 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     private List<String> hashes;
     private transient List<Observer> observers = new ArrayList<>();
 
+    private long idCounter = 0;
     private int numOfZeros;
     private String hashOfPrev = "0";
     private Block thisBlock;
@@ -25,6 +26,13 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     @Override
     public boolean receiveNextBlock(Block block, long blockTime) {
         if (!isBlockValid(block)) return false;
+
+        try {
+            block.setUnmodifiableId(++idCounter);
+        } catch (Exception e) {
+            --idCounter;
+            return false;
+        }
 
         this.thisBlock = block;
         this.blockTime = blockTime;
@@ -64,7 +72,7 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
         for (Block block : blocks) {
             sb.append("Block:\n");
             sb.append("Id: ");
-            sb.append(block.id);
+            sb.append(block.getId());
             sb.append("\nTimestamp: ");
             sb.append(block.timeStamp);
             sb.append("\nMagic number: ");
@@ -90,7 +98,7 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
 
     @Override
     public void notifyObservers() {
-        observers.forEach(obr -> obr.update(thisBlock.id, thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime));
+        observers.forEach(obr -> obr.update(thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime));
     }
 
     private void readObject(ObjectInputStream ois) throws Exception {
