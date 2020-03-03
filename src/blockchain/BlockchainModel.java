@@ -9,15 +9,19 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     private List<Block> blocks;
     private List<String> hashes;
     private transient List<Observer> observers = new ArrayList<>();
+    private transient Object lockData;
+    private List<String> newData;
+    private List<String> oldData;
 
     private long idCounter = 0;
-    private int numOfZeros = 0;
+    private volatile int numOfZeros = 0;
     private boolean regulateNumOfZeros = false;
     private int numOfZerosChange = Integer.MAX_VALUE;
-    private String hashOfPrev = "0";
+    private volatile String hashOfPrev = "0";
     private Block thisBlock;
     private long blockTime;
     private long minerId;
+    private final String NO_DATA = "no messages";
 
     @Override
     public void initialize(int numOfZeros) {
@@ -26,9 +30,13 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
         } else {
             this.numOfZeros = numOfZeros;
         }
-
         blocks = new ArrayList<>();
         hashes = new ArrayList<>();
+        newData = new ArrayList<>();
+        newData.add(NO_DATA);
+        oldData = new ArrayList<>();
+        oldData.add(NO_DATA);
+        lockData = new Object();
     }
 
     @Override
@@ -45,6 +53,8 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
         this.thisBlock = block;
         this.blockTime = blockTime;
         this.minerId = minerId;
+
+        swapData();
 
         blocks.add(thisBlock);
         hashes.add(thisBlock.hashOfThis);
@@ -63,6 +73,30 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
         }
         notifyObservers();
         return true;
+    }
+
+    @Override
+    public void receiveNextData(String data) {
+        synchronized (lockData) {
+            this.newData.add(data);
+        }
+    }
+
+    @Override
+    public String getData() {
+        synchronized (lockData) {
+            var sb = new StringBuilder();
+            oldData.forEach(sb::append);
+            return sb.toString();
+        }
+    }
+
+    private void swapData() {
+        synchronized (lockData) {
+            oldData = newData;
+            if (oldData.isEmpty()) oldData.add(NO_DATA);
+            newData = new ArrayList<>();
+        }
     }
 
     private boolean isBlockValid(Block block) {
@@ -130,6 +164,7 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     private void readObject(ObjectInputStream ois) throws Exception {
         ois.defaultReadObject();
         observers = new ArrayList<>();
+        lockData = new Object();
         if (isBlockchainHacked()) {
             throw new RuntimeException("Block hash does NOT match");
         }

@@ -34,6 +34,6 @@ public class Client {
     }
 
     private void sendData(String data) {
-      // model.
+        model.receiveNextData(data);
     }
 }

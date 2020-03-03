@@ -16,23 +16,18 @@ public class Miner {
         long startTime;
         Block thisBlock;
         long endTime;
-        int numOfZeros;
-        String hashOfPrev;
 
-        for (int i = 0; i < numOfBlocks; i++) {
-            hashOfPrev = blockchain.getHashOfPrev();
-            numOfZeros = blockchain.getNumOfZeros();
+            for (int i = 0; i < numOfBlocks; i++) {
+                startTime = System.currentTimeMillis();
+                thisBlock = createBlock(blockchain.getHashOfPrev(), blockchain.getData(), blockchain.getNumOfZeros());
+                endTime = System.currentTimeMillis();
 
-            startTime = System.currentTimeMillis();
-            thisBlock = createBlock(hashOfPrev, numOfZeros);
-            endTime = System.currentTimeMillis();
-
-            sendBlock(thisBlock, endTime - startTime);
-        }
+                sendBlock(thisBlock, endTime - startTime);
+            }
     }
 
-    private static Block createBlock(String hashOfPrev, int numOfZeros) {
-        return new Block(hashOfPrev, numOfZeros);
+    private static Block createBlock(String hashOfPrev, String data, int numOfZeros) {
+        return new Block(hashOfPrev, data, numOfZeros);
     }
 
     private void sendBlock(Block block, long blockTime) {

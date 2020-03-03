@@ -10,11 +10,13 @@ public class Block implements Serializable {
     public final long timeStamp;
     public final String hashOfPrev;
     public final String hashOfThis;
+    public final String data;
     private int magicNumber;
 
-    public Block(String hashOfPrev, int numOfZeros) {
+    public Block(String hashOfPrev, String data, int numOfZeros) {
         timeStamp = System.currentTimeMillis();
         this.hashOfPrev = hashOfPrev;
+        this.data = data;
         magicNumber = random.nextInt();
         hashOfThis = createHash(numOfZeros);
     }
@@ -24,6 +26,7 @@ public class Block implements Serializable {
 
         var sb = new StringBuilder();
         sb.append(timeStamp);
+        sb.append(data);
         sb.append(idAssigned);
         sb.append(id);
         sb.append(hashOfPrev);

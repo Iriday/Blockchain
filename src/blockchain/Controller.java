@@ -2,6 +2,7 @@ package blockchain;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 public class Controller {
     private BlockchainModelInterface model;
@@ -26,5 +27,8 @@ public class Controller {
             executor.submit(() -> new Miner(model, 10));
         }
         executor.shutdown();
+
+        Stream.of(new Client("Julia", model), new Client("Sarah", model), new Client("Kate", model))
+                .forEach(client -> new Thread(client::setOnline).start());
     }
 }

@@ -6,6 +6,10 @@ public interface BlockchainModelInterface {
 
     boolean receiveNextBlock(Block block, long blockTime, long minerId);
 
+    void receiveNextData(String data);
+
+    String getData();
+
     int getNumOfZeros();
 
     String getHashOfPrev();
