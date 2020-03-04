@@ -7,6 +7,7 @@ public class Client {
     private final BlockchainModelInterface model;
     private final String name;
     private boolean online = false;
+    private long id = 0;
 
     public Client(String name, BlockchainModelInterface model) {
         this.model = model;
@@ -21,7 +22,7 @@ public class Client {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            sendData(generateMessage(name));
+            sendData(generateMessage(name, ++id));
         }
     }
 
@@ -29,8 +30,8 @@ public class Client {
         online = false;
     }
 
-    private static String generateMessage(String name) {
-        return ("\n" + name + ": ...").repeat(rand.nextInt(3) + 1);
+    private static String generateMessage(String name, long id) {
+        return ("\n" + name + ": ...").repeat(rand.nextInt(3) + 1) + "  /data id: " + id;
     }
 
     private void sendData(String data) {

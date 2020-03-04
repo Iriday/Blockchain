@@ -158,7 +158,7 @@ public class BlockchainModel implements BlockchainModelInterface, Serializable {
     @Override
     public void notifyObservers() {
         observers.forEach(obr -> obr.update(
-                thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, minerId, numOfZeros, numOfZerosChange));
+                thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, minerId, numOfZeros, numOfZerosChange, oldData));
     }
 
     private void readObject(ObjectInputStream ois) throws Exception {

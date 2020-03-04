@@ -1,5 +1,6 @@
 package blockchain;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class ViewConsole implements Observer {
@@ -37,7 +38,7 @@ public class ViewConsole implements Observer {
     }
 
     @Override
-    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime, long minerId, int numOfZeros, int numOfZerosChange) {
+    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime, long minerId, int numOfZeros, int numOfZerosChange, List<String> data) {
         var sb = new StringBuilder();
 
         sb.append("\nBlock:\nCreated by miner # ");
@@ -52,6 +53,8 @@ public class ViewConsole implements Observer {
         sb.append(hashOfPrev);
         sb.append("\nHash of the block:\n");
         sb.append(hashOfThis);
+        sb.append("\nBlock data: ");
+        data.stream().forEach(line -> sb.append(line));
         sb.append("\nBlock was generating for ");
         sb.append(blockTime / 1000.0);
         sb.append(" seconds");
