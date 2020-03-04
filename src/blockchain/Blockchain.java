@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BlockchainModel implements BlockchainModelInterface, Serializable {
+public class Blockchain implements BlockchainInterface, Serializable {
     private List<Block> blocks;
     private List<String> hashes;
     private transient List<Observer> observers = new ArrayList<>();

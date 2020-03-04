@@ -1,12 +1,12 @@
 package blockchain;
 
 public class Miner {
-    private final BlockchainModelInterface blockchain;
+    private final BlockchainInterface blockchain;
     private final long numOfBlocks;
     private static long ids = 0;
     public final long id = ++ids;
 
-    public Miner(BlockchainModelInterface blockchain, long numOfBlocks) {
+    public Miner(BlockchainInterface blockchain, long numOfBlocks) {
         this.blockchain = blockchain;
         this.numOfBlocks = numOfBlocks;
         generateBlock(); // mineBlock
@@ -17,13 +17,13 @@ public class Miner {
         Block thisBlock;
         long endTime;
 
-            for (int i = 0; i < numOfBlocks; i++) {
-                startTime = System.currentTimeMillis();
-                thisBlock = createBlock(blockchain.getHashOfPrev(), blockchain.getData(), blockchain.getNumOfZeros());
-                endTime = System.currentTimeMillis();
+        for (int i = 0; i < numOfBlocks; i++) {
+            startTime = System.currentTimeMillis();
+            thisBlock = createBlock(blockchain.getHashOfPrev(), blockchain.getData(), blockchain.getNumOfZeros());
+            endTime = System.currentTimeMillis();
 
-                sendBlock(thisBlock, endTime - startTime);
-            }
+            sendBlock(thisBlock, endTime - startTime);
+        }
     }
 
     private static Block createBlock(String hashOfPrev, String data, int numOfZeros) {

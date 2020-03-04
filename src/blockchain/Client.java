@@ -4,13 +4,13 @@ import java.util.Random;
 
 public class Client {
     private static final Random rand = new Random();
-    private final BlockchainModelInterface model;
+    private final BlockchainInterface blockchain;
     private final String name;
     private boolean online = false;
     private long id = 0;
 
-    public Client(String name, BlockchainModelInterface model) {
-        this.model = model;
+    public Client(String name, BlockchainInterface blockchain) {
+        this.blockchain = blockchain;
         this.name = name;
     }
 
@@ -35,6 +35,6 @@ public class Client {
     }
 
     private void sendData(String data) {
-        model.receiveNextData(data);
+        blockchain.receiveNextData(data);
     }
 }

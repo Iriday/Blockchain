@@ -1,6 +1,6 @@
 package blockchain;
 
-public interface BlockchainModelInterface {
+public interface BlockchainInterface {
 
     void initialize(int numOfZeros);
 

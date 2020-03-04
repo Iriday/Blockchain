@@ -3,18 +3,22 @@ package blockchain;
 import java.util.List;
 import java.util.Scanner;
 
-public class ViewConsole implements Observer {
-    private final Controller controller;
-    private final BlockchainModelInterface model;
+public class ViewConsole implements ViewInterface, Observer {
+    private ControllerInterface controller;
+    private ModelInterface model;
+    private BlockchainInterface blockchain;
     private long blockId = 0;
 
-    public ViewConsole(Controller controller, BlockchainModelInterface model) {
+    @Override
+    public void initialize(ControllerInterface controller, ModelInterface model) {
         this.controller = controller;
         this.model = model;
-        model.registerObserver(this);
+        this.blockchain = model.getBlockchain();
+        blockchain.registerObserver(this);
     }
 
-    int input() {
+    @Override
+    public int input() {
         var scn = new Scanner(System.in);
         int input;
 
@@ -34,7 +38,7 @@ public class ViewConsole implements Observer {
         System.out.println(data);
         if (blockId % 10 != 0) return;
 
-        System.out.println(model.isBlockchainHacked() ? "\nWow, that's unbelievable! The blockchain is HACKED!" : "\nThe blockchain is not hacked.");
+        System.out.println(blockchain.isBlockchainHacked() ? "\nWow, that's unbelievable! The blockchain is HACKED!" : "\nThe blockchain is not hacked.");
     }
 
     @Override
