@@ -1,6 +1,7 @@
 package blockchain;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Random;
 
 public class Block implements Serializable {
@@ -10,10 +11,10 @@ public class Block implements Serializable {
     public final long timeStamp;
     public final String hashOfPrev;
     public final String hashOfThis;
-    public final String data;
+    public final List<BlockData> data;
     private int magicNumber;
 
-    public Block(String hashOfPrev, String data, int numOfZeros) {
+    public Block(String hashOfPrev, List<BlockData> data, int numOfZeros) {
         timeStamp = System.currentTimeMillis();
         this.hashOfPrev = hashOfPrev;
         this.data = data;
@@ -27,6 +28,11 @@ public class Block implements Serializable {
         var sb = new StringBuilder();
         sb.append(timeStamp);
         sb.append(data);
+        data.forEach(data -> {
+            sb.append(data);
+            sb.append(data.getId());
+            sb.append(data.getData());
+        });
         sb.append(idAssigned);
         sb.append(id);
         sb.append(hashOfPrev);

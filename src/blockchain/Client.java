@@ -30,11 +30,11 @@ public class Client {
         online = false;
     }
 
-    private static String generateMessage(String name, long id) {
-        return ("\n" + name + ": ...").repeat(rand.nextInt(3) + 1) + "  /data id: " + id;
+    private static Message generateMessage(String name, long id) {
+        return new Message(("\n" + name + ": ...").repeat(rand.nextInt(3) + 1), id);
     }
 
-    private void sendData(String data) {
+    private void sendData(BlockData data) {
         blockchain.receiveNextData(data);
     }
 }

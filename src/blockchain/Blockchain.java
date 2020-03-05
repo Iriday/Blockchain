@@ -10,8 +10,8 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private List<String> hashes;
     private transient List<Observer> observers = new ArrayList<>();
     private transient Object lockData;
-    private List<String> newData;
-    private List<String> oldData;
+    private List<BlockData> newData;
+    private List<BlockData> oldData;
 
     private long idCounter = 0;
     private volatile int numOfZeros = 0;
@@ -21,7 +21,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private Block thisBlock;
     private long blockTime;
     private long minerId;
-    private final String NO_DATA = "no messages";
+    private final BlockData NO_DATA = Message.getEmptyData();
 
     @Override
     public void initialize(int numOfZeros) {
@@ -76,18 +76,16 @@ public class Blockchain implements BlockchainInterface, Serializable {
     }
 
     @Override
-    public void receiveNextData(String data) {
+    public void receiveNextData(BlockData data) {
         synchronized (lockData) {
             this.newData.add(data);
         }
     }
 
     @Override
-    public String getData() {
+    public List<BlockData> getData() {
         synchronized (lockData) {
-            var sb = new StringBuilder();
-            oldData.forEach(sb::append);
-            return sb.toString();
+            return oldData;
         }
     }
 

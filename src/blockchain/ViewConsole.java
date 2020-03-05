@@ -42,7 +42,7 @@ public class ViewConsole implements ViewInterface, Observer {
     }
 
     @Override
-    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime, long minerId, int numOfZeros, int numOfZerosChange, List<String> data) {
+    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime, long minerId, int numOfZeros, int numOfZerosChange, List<BlockData> data) {
         var sb = new StringBuilder();
 
         sb.append("\nBlock:\nCreated by miner # ");
@@ -58,7 +58,13 @@ public class ViewConsole implements ViewInterface, Observer {
         sb.append("\nHash of the block:\n");
         sb.append(hashOfThis);
         sb.append("\nBlock data: ");
-        data.stream().forEach(line -> sb.append(line));
+        data.forEach(message -> {
+            sb.append(message.getData());
+            if (message.getId() != -1) {
+                sb.append(" /data id: ");
+                sb.append(message.getId());
+            }
+        });
         sb.append("\nBlock was generating for ");
         sb.append(blockTime / 1000.0);
         sb.append(" seconds");

@@ -1,5 +1,7 @@
 package blockchain;
 
+import java.util.List;
+
 public class Miner {
     private final BlockchainInterface blockchain;
     private final long numOfBlocks;
@@ -26,7 +28,7 @@ public class Miner {
         }
     }
 
-    private static Block createBlock(String hashOfPrev, String data, int numOfZeros) {
+    private static Block createBlock(String hashOfPrev, List<BlockData> data, int numOfZeros) {
         return new Block(hashOfPrev, data, numOfZeros);
     }
 
