@@ -9,8 +9,8 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private List<Block> blocks;
     private List<String> hashes;
     private transient List<Observer> observers = new ArrayList<>();
-    private transient Object lockData;
-    private transient Object lockBlockDataId;
+    private final Lock lockData = new Lock();
+    private final Lock lockBlockDataId = new Lock();
     private List<BlockData> newData;
     private List<BlockData> oldData;
 
@@ -38,8 +38,6 @@ public class Blockchain implements BlockchainInterface, Serializable {
         newData.add(NO_DATA);
         oldData = new ArrayList<>();
         oldData.add(NO_DATA);
-        lockData = new Object();
-        lockBlockDataId = new Object();
     }
 
     @Override
@@ -172,8 +170,6 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private void readObject(ObjectInputStream ois) throws Exception {
         ois.defaultReadObject();
         observers = new ArrayList<>();
-        lockData = new Object();
-        lockBlockDataId = new Object();
         if (isBlockchainHacked()) {
             throw new RuntimeException("Block hash does NOT match");
         }
@@ -187,5 +183,8 @@ public class Blockchain implements BlockchainInterface, Serializable {
     @Override
     public String getHashOfPrev() {
         return hashOfPrev;
+    }
+
+    private static class Lock implements Serializable {
     }
 }
