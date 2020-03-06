@@ -12,6 +12,8 @@ public interface BlockchainInterface {
 
     List<BlockData> getData();
 
+    long getNextBlockDataId();
+
     int getNumOfZeros();
 
     String getHashOfPrev();

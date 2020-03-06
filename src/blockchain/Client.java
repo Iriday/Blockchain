@@ -7,7 +7,6 @@ public class Client {
     private final BlockchainInterface blockchain;
     private final String name;
     private boolean online = false;
-    private long id = 0;
 
     public Client(String name, BlockchainInterface blockchain) {
         this.blockchain = blockchain;
@@ -22,7 +21,7 @@ public class Client {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            sendData(generateMessage(name, ++id));
+            sendData(generateMessage(name, blockchain.getNextBlockDataId()));
         }
     }
 
