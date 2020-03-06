@@ -1,7 +1,5 @@
 package blockchain;
 
-import java.util.List;
-
 public interface BlockchainInterface {
 
     void initialize(int numOfZeros);
@@ -10,13 +8,9 @@ public interface BlockchainInterface {
 
     void receiveNextData(BlockData data);
 
-    List<BlockData> getData();
+    Object[] getDataForNewBlock();
 
     long getNextBlockDataId();
-
-    int getNumOfZeros();
-
-    String getHashOfPrev();
 
     boolean isBlockchainHacked();
 

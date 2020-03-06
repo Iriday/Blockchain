@@ -84,9 +84,10 @@ public class Blockchain implements BlockchainInterface, Serializable {
     }
 
     @Override
-    public List<BlockData> getData() {
+    public Object[] getDataForNewBlock() {
         synchronized (lockData) {
-            return oldData;
+            Object[] data = {hashOfPrev, oldData, numOfZeros};
+            return data;
         }
     }
 
@@ -173,16 +174,6 @@ public class Blockchain implements BlockchainInterface, Serializable {
         if (isBlockchainHacked()) {
             throw new RuntimeException("Block hash does NOT match");
         }
-    }
-
-    @Override
-    public int getNumOfZeros() {
-        return numOfZeros;
-    }
-
-    @Override
-    public String getHashOfPrev() {
-        return hashOfPrev;
     }
 
     private static class Lock implements Serializable {

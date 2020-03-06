@@ -18,10 +18,13 @@ public class Miner {
         long startTime;
         Block thisBlock;
         long endTime;
+        Object[] data;
 
         for (int i = 0; i < numOfBlocks; i++) {
+            data = blockchain.getDataForNewBlock();
+
             startTime = System.currentTimeMillis();
-            thisBlock = createBlock(blockchain.getHashOfPrev(), blockchain.getData(), blockchain.getNumOfZeros());
+            thisBlock = createBlock((String) data[0], (List<BlockData>) data[1], (int) data[2]);
             endTime = System.currentTimeMillis();
 
             sendBlock(thisBlock, endTime - startTime);
