@@ -11,12 +11,13 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private transient List<Observer> observers = new ArrayList<>();
     private final Lock lockData = new Lock();
     private final Lock lockBlockDataId = new Lock();
-    private List<BlockData> newData;
-    private List<BlockData> oldData;
+    private volatile List<BlockData> newData;
+    private volatile List<BlockData> oldData;
+    private Object[] data;
 
     private long idCounter = 0;
     private volatile int numOfZeros = 0;
-    private boolean regulateNumOfZeros = false;
+    private volatile boolean regulateNumOfZeros = false;
     private int numOfZerosChange = Integer.MAX_VALUE;
     private volatile String hashOfPrev = "0";
     private Block thisBlock;
@@ -24,20 +25,19 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private long minerId;
     private final BlockData NO_DATA = Message.getEmptyData();
     private long currentBlockDataId = 0;
+    private volatile boolean switcher = false;
 
     @Override
     public void initialize(int numOfZeros) {
-        if (numOfZeros < 0) {
-            regulateNumOfZeros = true;
-        } else {
-            this.numOfZeros = numOfZeros;
-        }
+        if (numOfZeros < 0) regulateNumOfZeros = true;
+        else this.numOfZeros = numOfZeros;
+
         blocks = new ArrayList<>();
         hashes = new ArrayList<>();
         newData = new ArrayList<>();
-        newData.add(NO_DATA);
         oldData = new ArrayList<>();
         oldData.add(NO_DATA);
+        createDataForNewBlock();
     }
 
     @Override
@@ -55,8 +55,6 @@ public class Blockchain implements BlockchainInterface, Serializable {
         this.blockTime = blockTime;
         this.minerId = minerId;
 
-        swapData();
-
         blocks.add(thisBlock);
         hashes.add(thisBlock.hashOfThis);
         hashOfPrev = thisBlock.hashOfThis;
@@ -73,28 +71,35 @@ public class Blockchain implements BlockchainInterface, Serializable {
             throw new RuntimeException(e);
         }
         notifyObservers();
+        switcher = true;
         return true;
     }
 
     @Override
-    public void receiveNextData(BlockData data) {
+    public void receiveNextData(BlockData blockData) {
         synchronized (lockData) {
-            this.newData.add(data);
+            this.newData.add(blockData);
+            if (switcher) {
+                swapData();
+                createDataForNewBlock();
+                switcher = false;
+            }
         }
+    }
+
+    private void createDataForNewBlock() {
+        data = new Object[]{hashOfPrev, oldData, numOfZeros};
     }
 
     @Override
     public Object[] getDataForNewBlock() {
-        synchronized (lockData) {
-            Object[] data = {hashOfPrev, oldData, numOfZeros};
-            return data;
-        }
+        if (switcher) return null;
+        return data;
     }
 
     private void swapData() {
         synchronized (lockData) {
             oldData = newData;
-            if (oldData.isEmpty()) oldData.add(NO_DATA);
             newData = new ArrayList<>();
         }
     }
@@ -165,15 +170,16 @@ public class Blockchain implements BlockchainInterface, Serializable {
     @Override
     public void notifyObservers() {
         observers.forEach(obr -> obr.update(
-                thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, minerId, numOfZeros, numOfZerosChange, oldData));
+                thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, minerId, numOfZeros, numOfZerosChange, thisBlock.data));
     }
 
     private void readObject(ObjectInputStream ois) throws Exception {
         ois.defaultReadObject();
-        observers = new ArrayList<>();
         if (isBlockchainHacked()) {
             throw new RuntimeException("Block hash does NOT match");
         }
+        observers = new ArrayList<>();
+        switcher = true;
     }
 
     private static class Lock implements Serializable {

@@ -21,7 +21,9 @@ public class Miner {
         Object[] data;
 
         for (int i = 0; i < numOfBlocks; i++) {
-            data = blockchain.getDataForNewBlock();
+            while ((data = blockchain.getDataForNewBlock()) == null) {
+                Thread.yield();
+            }
 
             startTime = System.currentTimeMillis();
             thisBlock = createBlock((String) data[0], (List<BlockData>) data[1], (int) data[2]);
