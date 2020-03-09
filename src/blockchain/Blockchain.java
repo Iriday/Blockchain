@@ -26,6 +26,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private final BlockData NO_DATA = Message.getEmptyData();
     private long currentBlockDataId = 0;
     private volatile boolean switcher = false;
+    private long maxPrevBlockDataId = -1;
 
     @Override
     public void initialize(int numOfZeros) {
@@ -42,7 +43,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
 
     @Override
     public synchronized boolean receiveNextBlock(Block block, long blockTime, long minerId) {
-        if (!isBlockValid(block)) return false;
+        if (!isBlockValid(block, maxPrevBlockDataId, numOfZeros, hashOfPrev)) return false;
 
         try {
             block.setUnmodifiableId(++idCounter);
@@ -58,6 +59,8 @@ public class Blockchain implements BlockchainInterface, Serializable {
         blocks.add(thisBlock);
         hashes.add(thisBlock.hashOfThis);
         hashOfPrev = thisBlock.hashOfThis;
+
+        maxPrevBlockDataId = getMaxBlockDataId(thisBlock.data);
 
         if (regulateNumOfZeros) {
             int newNumOfZeros = adjustNumOfZeros(numOfZeros, blockTime);
@@ -111,7 +114,23 @@ public class Blockchain implements BlockchainInterface, Serializable {
         }
     }
 
-    private boolean isBlockValid(Block block) {
+    private static long getMaxBlockDataId(List<BlockData> blockData) {
+        return blockData.stream().mapToLong(BlockData::getId).max().orElseThrow();
+    }
+
+    private static long[] getSortedIds(List<BlockData> blockData) {
+        return blockData.stream().mapToLong(BlockData::getId).sorted().toArray();
+    }
+
+    private static boolean isBlockValid(Block block, long maxPrevBlockDataId, int numOfZeros, String hashOfPrev) {
+        if (block == null || block.data == null || block.data.isEmpty()) return false;
+
+        long[] ids = getSortedIds(block.data);
+
+        if ((maxPrevBlockDataId + 1) != ids[0]) return false;
+        for (int i = 1; i < ids.length; i++) {
+            if ((ids[i - 1] + 1) != ids[i]) return false;
+        }
         return Utils.startsWithZeros(block.hashOfThis, numOfZeros) && hashOfPrev.equals(block.hashOfPrev);
     }
 

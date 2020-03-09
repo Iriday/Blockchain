@@ -60,7 +60,7 @@ public class ViewConsole implements ViewInterface, Observer {
         sb.append("\nBlock data: ");
         data.forEach(message -> {
             sb.append(message.getData());
-            if (message.getId() != -1) {
+            if (message.getId() != 0) {
                 sb.append(" /data id: ");
                 sb.append(message.getId());
             }

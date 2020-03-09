@@ -25,6 +25,6 @@ public class Message implements BlockData, Serializable {
 
 
     public static Message getEmptyData() {
-        return new Message("no data", -1);
+        return new Message("no data", 0);
     }
 }
