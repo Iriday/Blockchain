@@ -4,6 +4,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.LongStream;
 
 public class Blockchain implements BlockchainInterface, Serializable {
     private List<Block> blocks;
@@ -140,9 +141,22 @@ public class Blockchain implements BlockchainInterface, Serializable {
     }
 
     private static boolean isBlockchainValid(List<Block> blocks, List<String> hashes) {
+        if (blocks == null || hashes == null || hashes.isEmpty() || blocks.size() != hashes.size())
+            return false;
         for (int i = 0; i < hashes.size(); i++) {
-            if (!hashes.get(i).equals(blocks.get(i).hashOfThis))
-                return false;
+            Block block = blocks.get(i);
+            if (block == null || block.data == null || block.data.isEmpty()) return false;
+            if (!hashes.get(i).equals(block.hashOfThis)) return false;
+        }
+        // check BlockData id
+        long[] ids = blocks.stream()
+                .map(block -> Blockchain.getSortedIds(block.data))
+                .flatMapToLong(LongStream::of)
+                .toArray();
+
+        if (ids[0] != 0) return false;
+        for (int i = 1; i < ids.length; i++) {
+            if ((ids[i - 1] + 1) != ids[i]) return false;
         }
         return true;
     }
