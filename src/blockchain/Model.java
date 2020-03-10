@@ -38,7 +38,7 @@ public class Model implements ModelInterface {
         executor.shutdown();
 
         // init/run clients
-        Stream.of(new Client("Julia", blockchain), new Client("Sarah", blockchain), new Client("Kate", blockchain))
+        Stream.of(new Client("Julia", blockchain), new Client("Sarah", blockchain), new Client("Kate", blockchain), new Client("Ivy", blockchain), new Client("Grace", blockchain))
                 .forEach(client -> new Thread(client::setOnline).start());
     }
 
