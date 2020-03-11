@@ -125,14 +125,27 @@ public class Blockchain implements BlockchainInterface, Serializable {
 
     private static boolean isBlockValid(Block block, long maxPrevBlockDataId, int numOfZeros, String hashOfPrev) {
         if (block == null || block.data == null || block.data.isEmpty()) return false;
-
+        //check id(s)
         long[] ids = getSortedIds(block.data);
-
         if ((maxPrevBlockDataId + 1) != ids[0]) return false;
         for (int i = 1; i < ids.length; i++) {
             if ((ids[i - 1] + 1) != ids[i]) return false;
         }
-        return Utils.startsWithZeros(block.hashOfThis, numOfZeros) && hashOfPrev.equals(block.hashOfPrev);
+        //check numOfZeros, hash, signature(s)
+        return Utils.startsWithZeros(block.hashOfThis, numOfZeros) && hashOfPrev.equals(block.hashOfPrev) && checkSignatures(block.data);
+    }
+
+    private static boolean checkSignatures(List<BlockData> blockData) {
+        for (BlockData d : blockData) {
+            try {
+                if (!SignatureUtils.verifyData(d.getData() + d.getId(), d.getSignature(), d.getPublicKey())) {
+                    return false;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return true;
     }
 
     @Override
@@ -157,6 +170,10 @@ public class Blockchain implements BlockchainInterface, Serializable {
         if (ids[0] != 0) return false;
         for (int i = 1; i < ids.length; i++) {
             if ((ids[i - 1] + 1) != ids[i]) return false;
+        }
+        //check signature(s)
+        for (Block block : blocks) {
+            if (!checkSignatures(block.data)) return false;
         }
         return true;
     }
