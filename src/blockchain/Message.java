@@ -11,11 +11,10 @@ public class Message implements BlockData, Serializable {
     private final byte[] signature;
     private final PublicKey publicKey;
 
-    public Message(String message, long id) {
+    public Message(String message, long id, KeyPair keyPair) {
         this.message = message;
         this.id = id;
         try {
-            KeyPair keyPair = SignatureUtils.generateKeys();
             this.publicKey = keyPair.getPublic();
             this.signature = SignatureUtils.createSignature((message + id), keyPair.getPrivate());
         } catch (Exception e) {
@@ -45,6 +44,12 @@ public class Message implements BlockData, Serializable {
     }
 
     public static Message getEmptyData() {
-        return new Message("no data", 0);
+        KeyPair keyPair;
+        try {
+            keyPair = SignatureUtils.generateKeys();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new Message("no data", 0, keyPair);
     }
 }

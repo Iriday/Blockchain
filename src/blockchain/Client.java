@@ -1,5 +1,6 @@
 package blockchain;
 
+import java.security.KeyPair;
 import java.util.Random;
 
 public class Client {
@@ -7,10 +8,16 @@ public class Client {
     private final BlockchainInterface blockchain;
     private final String name;
     private boolean online = false;
+    private final KeyPair keyPair;
 
     public Client(String name, BlockchainInterface blockchain) {
         this.blockchain = blockchain;
         this.name = name;
+        try {
+            keyPair = SignatureUtils.generateKeys();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setOnline() {
@@ -21,7 +28,7 @@ public class Client {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            sendData(generateMessage(name, blockchain.getNextBlockDataId()));
+            sendData(generateMessage(name, blockchain.getNextBlockDataId(), keyPair));
         }
     }
 
@@ -29,8 +36,8 @@ public class Client {
         online = false;
     }
 
-    private static Message generateMessage(String name, long id) {
-        return new Message(("\n" + name + ": ...").repeat(rand.nextInt(3) + 1), id);
+    private static Message generateMessage(String name, long id, KeyPair keyPair) {
+        return new Message(("\n" + name + ": ...").repeat(rand.nextInt(3) + 1), id, keyPair);
     }
 
     private void sendData(BlockData data) {
