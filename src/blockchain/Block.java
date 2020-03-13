@@ -13,11 +13,13 @@ public class Block implements Serializable {
     public final String hashOfThis;
     public final List<BlockData> data;
     private int magicNumber;
+    private final String createdBy;
 
-    public Block(String hashOfPrev, List<BlockData> data, int numOfZeros) {
+    public Block(String hashOfPrev, List<BlockData> data, int numOfZeros, String createdBy) {
         timeStamp = System.currentTimeMillis();
         this.hashOfPrev = hashOfPrev;
         this.data = data;
+        this.createdBy = createdBy;
         magicNumber = random.nextInt();
         hashOfThis = createHash(numOfZeros);
     }
@@ -35,6 +37,7 @@ public class Block implements Serializable {
         });
         sb.append(idAssigned);
         sb.append(id);
+        sb.append(createdBy);
         sb.append(hashOfPrev);
 
         String hash;

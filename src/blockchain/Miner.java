@@ -7,10 +7,13 @@ public class Miner {
     private final long numOfBlocks;
     private static long ids = 0;
     public final long id = ++ids;
+    private final String minerName;
+    private long coins = 0;
 
     public Miner(BlockchainInterface blockchain, long numOfBlocks) {
         this.blockchain = blockchain;
         this.numOfBlocks = numOfBlocks;
+        minerName = "miner # " + id;
         generateBlock(); // mineBlock
     }
 
@@ -26,18 +29,18 @@ public class Miner {
             }
 
             startTime = System.currentTimeMillis();
-            thisBlock = createBlock((String) data[0], (List<BlockData>) data[1], (int) data[2]);
+            thisBlock = createBlock((String) data[0], (List<BlockData>) data[1], (int) data[2], minerName);
             endTime = System.currentTimeMillis();
 
-            sendBlock(thisBlock, endTime - startTime);
+            coins += sendBlock(thisBlock, endTime - startTime, id);
         }
     }
 
-    private static Block createBlock(String hashOfPrev, List<BlockData> data, int numOfZeros) {
-        return new Block(hashOfPrev, data, numOfZeros);
+    private static Block createBlock(String hashOfPrev, List<BlockData> data, int numOfZeros, String createdBy) {
+        return new Block(hashOfPrev, data, numOfZeros, createdBy);
     }
 
-    private void sendBlock(Block block, long blockTime) {
-        blockchain.receiveNextBlock(block, blockTime, id);
+    private long sendBlock(Block block, long blockTime, long id) {
+        return blockchain.receiveNextBlock(block, blockTime, id);
     }
 }

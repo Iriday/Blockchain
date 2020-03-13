@@ -9,6 +9,7 @@ import java.util.stream.LongStream;
 public class Blockchain implements BlockchainInterface, Serializable {
     private List<Block> blocks;
     private List<String> hashes;
+    private long coins = 999_999_999;
     private transient List<Observer> observers = new ArrayList<>();
     private final Lock lockData = new Lock();
     private final Lock lockBlockDataId = new Lock();
@@ -43,14 +44,14 @@ public class Blockchain implements BlockchainInterface, Serializable {
     }
 
     @Override
-    public synchronized boolean receiveNextBlock(Block block, long blockTime, long minerId) {
-        if (!isBlockValid(block, maxPrevBlockDataId, numOfZeros, hashOfPrev)) return false;
+    public synchronized long receiveNextBlock(Block block, long blockTime, long minerId) {
+        if (!isBlockValid(block, maxPrevBlockDataId, numOfZeros, hashOfPrev)) return 0;
 
         try {
             block.setUnmodifiableId(++idCounter);
         } catch (Exception e) {
             --idCounter;
-            return false;
+            return 0;
         }
 
         this.thisBlock = block;
@@ -76,7 +77,8 @@ public class Blockchain implements BlockchainInterface, Serializable {
         }
         notifyObservers();
         switcher = true;
-        return true;
+        coins -= 100;
+        return 100;
     }
 
     @Override
