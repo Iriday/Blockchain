@@ -42,12 +42,13 @@ public class ViewConsole implements ViewInterface, Observer {
     }
 
     @Override
-    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime, long minerId, long minerGetsVC, int numOfZeros, int numOfZerosChange, List<BlockData> data) {
+    public void update(long blockId, long timestamp, int magicNumber, String hashOfPrev, String hashOfThis, long blockTime, String minerName, long minerGetsVC, int numOfZeros, int numOfZerosChange, List<BlockData> data) {
         var sb = new StringBuilder();
 
-        sb.append("\nBlock:\nCreated by miner # ");
-        sb.append(minerId);
-        sb.append("\nminer # " + minerId);
+        sb.append("\nBlock:\nCreated by ");
+        sb.append(minerName);
+        sb.append("\n");
+        sb.append(minerName);
         sb.append(" gets ");
         sb.append(minerGetsVC);
         sb.append(" VC");

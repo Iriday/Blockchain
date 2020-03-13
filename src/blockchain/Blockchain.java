@@ -223,7 +223,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
     @Override
     public void notifyObservers() {
         observers.forEach(obr -> obr.update(
-                thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, minerId, minerGetsVC, numOfZeros, numOfZerosChange, thisBlock.data));
+                thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, thisBlock.createdBy, minerGetsVC, numOfZeros, numOfZerosChange, thisBlock.data));
     }
 
     private void readObject(ObjectInputStream ois) throws Exception {

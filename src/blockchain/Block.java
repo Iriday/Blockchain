@@ -13,7 +13,7 @@ public class Block implements Serializable {
     public final String hashOfThis;
     public final List<BlockData> data;
     private int magicNumber;
-    private final String createdBy;
+    public final String createdBy;
 
     public Block(String hashOfPrev, List<BlockData> data, int numOfZeros, String createdBy) {
         timeStamp = System.currentTimeMillis();
