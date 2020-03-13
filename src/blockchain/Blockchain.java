@@ -29,6 +29,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private long currentBlockDataId = 0;
     private volatile boolean switcher = false;
     private long maxPrevBlockDataId = -1;
+    private final long minerGetsVC = 100;
 
     @Override
     public void initialize(int numOfZeros) {
@@ -78,7 +79,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
         notifyObservers();
         switcher = true;
         coins -= 100;
-        return 100;
+        return minerGetsVC;
     }
 
     @Override
@@ -222,7 +223,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
     @Override
     public void notifyObservers() {
         observers.forEach(obr -> obr.update(
-                thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, minerId, numOfZeros, numOfZerosChange, thisBlock.data));
+                thisBlock.getId(), thisBlock.timeStamp, thisBlock.getMagicNumber(), thisBlock.hashOfPrev, thisBlock.hashOfThis, blockTime, minerId, minerGetsVC, numOfZeros, numOfZerosChange, thisBlock.data));
     }
 
     private void readObject(ObjectInputStream ois) throws Exception {
