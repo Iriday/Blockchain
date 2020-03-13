@@ -13,7 +13,7 @@ public class Miner {
     public Miner(BlockchainInterface blockchain, long numOfBlocks) {
         this.blockchain = blockchain;
         this.numOfBlocks = numOfBlocks;
-        minerName = "miner # " + id;
+        minerName = "miner #" + id;
         generateBlock(); // mineBlock
     }
 
