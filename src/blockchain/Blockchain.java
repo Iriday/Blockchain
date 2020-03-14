@@ -13,6 +13,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private transient List<Observer> observers = new ArrayList<>();
     private final Lock lockData = new Lock();
     private final Lock lockBlockDataId = new Lock();
+    private final Lock lockReceiveNextBlock = new Lock();
     private volatile List<BlockData> newData;
     private volatile List<BlockData> oldData;
     private Object[] data;
@@ -45,41 +46,43 @@ public class Blockchain implements BlockchainInterface, Serializable {
     }
 
     @Override
-    public synchronized long receiveNextBlock(Block block, long blockTime, long minerId) {
-        if (!isBlockValid(block, maxPrevBlockDataId, numOfZeros, hashOfPrev)) return 0;
+    public long receiveNextBlock(Block block, long blockTime, long minerId) {
+        synchronized (lockReceiveNextBlock) {
+            if (!isBlockValid(block, maxPrevBlockDataId, numOfZeros, hashOfPrev)) return 0;
 
-        try {
-            block.setUnmodifiableId(++idCounter);
-        } catch (Exception e) {
-            --idCounter;
-            return 0;
+            try {
+                block.setUnmodifiableId(++idCounter);
+            } catch (Exception e) {
+                --idCounter;
+                return 0;
+            }
+
+            this.thisBlock = block;
+            this.blockTime = blockTime;
+            this.minerId = minerId;
+
+            blocks.add(thisBlock);
+            hashes.add(thisBlock.hashOfThis);
+            hashOfPrev = thisBlock.hashOfThis;
+
+            maxPrevBlockDataId = getMaxBlockDataId(thisBlock.data);
+
+            if (regulateNumOfZeros) {
+                int newNumOfZeros = adjustNumOfZeros(numOfZeros, blockTime);
+                numOfZerosChange = newNumOfZeros - numOfZeros; // -1, 0, or 1
+                numOfZeros = newNumOfZeros;
+            }
+
+            try {
+                SerializationUtils.serialize(this, "src/blockchain/data.txt");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            notifyObservers();
+            switcher = true;
+            coins -= 100;
+            return minerGetsVC;
         }
-
-        this.thisBlock = block;
-        this.blockTime = blockTime;
-        this.minerId = minerId;
-
-        blocks.add(thisBlock);
-        hashes.add(thisBlock.hashOfThis);
-        hashOfPrev = thisBlock.hashOfThis;
-
-        maxPrevBlockDataId = getMaxBlockDataId(thisBlock.data);
-
-        if (regulateNumOfZeros) {
-            int newNumOfZeros = adjustNumOfZeros(numOfZeros, blockTime);
-            numOfZerosChange = newNumOfZeros - numOfZeros; // -1, 0, or 1
-            numOfZeros = newNumOfZeros;
-        }
-
-        try {
-            SerializationUtils.serialize(this, "src/blockchain/data.txt");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        notifyObservers();
-        switcher = true;
-        coins -= 100;
-        return minerGetsVC;
     }
 
     @Override
