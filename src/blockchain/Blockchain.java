@@ -194,6 +194,31 @@ public class Blockchain implements BlockchainInterface, Serializable {
         else return --numOfZeros; // >=7
     }
 
+    @Override
+    public long countUserCoins(String userName) {
+        return countUserCoins(blocks, userName, minerGetsVC);
+    }
+
+    private long countUserCoins(List<Block> blocks, String userName, long blockPrice) {
+        // +received
+        if (blocks.isEmpty()) return 0;
+        long coins = blocks.stream()
+                .flatMap(block -> block.data.stream())
+                .filter(d -> d.getData().endsWith("\n" + userName))
+                .mapToLong(d -> Integer.parseInt(d.getData().substring(d.getData().indexOf("\n") + 1, d.getData().lastIndexOf("\n"))))
+                .reduce(Long::sum)
+                .orElse(0);
+        // -sent
+        coins -= blocks.stream()
+                .flatMap(block -> block.data.stream())
+                .filter(d -> d.getData().startsWith(userName + "\n"))
+                .mapToLong(d -> Integer.parseInt(d.getData().substring(d.getData().indexOf("\n") + 1, d.getData().lastIndexOf("\n"))))
+                .reduce(Long::sum)
+                .orElse(0);
+        // if miner +coins for blocks
+        return coins += blocks.stream().filter(d -> d.createdBy.equals(userName)).count() * blockPrice;
+    }
+
     public String toString() {
         var sb = new StringBuilder();
         for (Block block : blocks) {

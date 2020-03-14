@@ -12,6 +12,8 @@ public interface BlockchainInterface {
 
     long getNextBlockDataId();
 
+    long countUserCoins(String userName);
+
     boolean isBlockchainHacked();
 
     void registerObserver(Observer observer);
