@@ -63,13 +63,27 @@ public class ViewConsole implements ViewInterface, Observer {
         sb.append("\nHash of the block:\n");
         sb.append(hashOfThis);
         sb.append("\nBlock data: ");
-        data.forEach(message -> {
-            sb.append(message.getData());
-            if (message.getId() != 0) {
-                sb.append(" /data id: ");
-                sb.append(message.getId());
-            }
-        });
+        if (data.get(0) instanceof Message) {
+            data.forEach(message -> {
+                sb.append(message.getData());
+                if (message.getId() != 0) {
+                    sb.append(" /data id: ");
+                    sb.append(message.getId());
+                }
+            });
+        } else if (data.get(0) instanceof Transaction) {
+            data.forEach(transaction -> {
+                String[] t = transaction.getData().split("\n");
+                sb.append("\n");
+                sb.append(t[0]);
+                if (transaction.getId() != 0) {
+                    sb.append(" sent ");
+                    sb.append(t[1]);
+                    sb.append(" VC to ");
+                    sb.append(t[2]);
+                }
+            });
+        }
         sb.append("\nBlock was generating for ");
         sb.append(blockTime / 1000.0);
         sb.append(" seconds");
