@@ -200,23 +200,32 @@ public class Blockchain implements BlockchainInterface, Serializable {
     }
 
     private long countUserCoins(List<Block> blocks, String userName, long blockPrice) {
-        // +received
+        if (userName == null || userName.isEmpty() || blocks == null || blockPrice <= 0)
+            throw new IllegalArgumentException();
         if (blocks.isEmpty()) return 0;
-        long coins = blocks.stream()
+
+        long receivedCoins = blocks.stream()
                 .flatMap(block -> block.data.stream())
                 .filter(d -> d.getData().endsWith("\n" + userName))
                 .mapToLong(d -> Integer.parseInt(d.getData().substring(d.getData().indexOf("\n") + 1, d.getData().lastIndexOf("\n"))))
                 .reduce(Long::sum)
                 .orElse(0);
-        // -sent
-        coins -= blocks.stream()
+        // if miner +coins for blocks
+        receivedCoins += blocks.stream().filter(d -> d.createdBy.equals(userName)).count() * blockPrice;
+
+        long sentCoins = blocks.stream()
                 .flatMap(block -> block.data.stream())
                 .filter(d -> d.getData().startsWith(userName + "\n"))
                 .mapToLong(d -> Integer.parseInt(d.getData().substring(d.getData().indexOf("\n") + 1, d.getData().lastIndexOf("\n"))))
                 .reduce(Long::sum)
                 .orElse(0);
-        // if miner +coins for blocks
-        return coins += blocks.stream().filter(d -> d.createdBy.equals(userName)).count() * blockPrice;
+
+        if (receivedCoins < 0 || sentCoins < 0)
+            throw new RuntimeException("receivedCoins || sentCoins < 0, blockchain is not correct");
+        if (sentCoins > receivedCoins)
+            throw new RuntimeException("sentCoins > receivedCoins, blockchain is not correct");
+
+        return receivedCoins - sentCoins; // hasCoins
     }
 
     public String toString() {
