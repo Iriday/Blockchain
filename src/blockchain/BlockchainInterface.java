@@ -6,7 +6,7 @@ public interface BlockchainInterface {
 
     long receiveNextBlock(Block block, long blockTime, long minerId);
 
-    void receiveNextData(BlockData data);
+    boolean receiveNextData(BlockData data);
 
     Object[] getDataForNewBlock();
 

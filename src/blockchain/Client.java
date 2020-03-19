@@ -28,7 +28,9 @@ public class Client {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            sendData(generateMessage(name, blockchain.getNextBlockDataId(), keyPair));
+            String message = generateMessage(name);
+
+            while (!blockchain.receiveNextData(new Message(message, blockchain.getNextBlockDataId(), keyPair))) ;
         }
     }
 
@@ -36,11 +38,7 @@ public class Client {
         online = false;
     }
 
-    private static Message generateMessage(String name, long id, KeyPair keyPair) {
-        return new Message(("\n" + name + ": ...").repeat(rand.nextInt(3) + 1), id, keyPair);
-    }
-
-    private void sendData(BlockData data) {
-        blockchain.receiveNextData(data);
+    private static String generateMessage(String senderName) {
+        return ("\n" + senderName + ": ...").repeat(rand.nextInt(3) + 1);
     }
 }

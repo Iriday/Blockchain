@@ -32,6 +32,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private volatile boolean switcher = false;
     private long maxPrevBlockDataId = -1;
     private final long minerGetsVC = 100;
+    private long lastAcceptedBlockDataId = 1;
 
     @Override
     public void initialize(int numOfZeros) {
@@ -91,14 +92,17 @@ public class Blockchain implements BlockchainInterface, Serializable {
     }
 
     @Override
-    public void receiveNextData(BlockData blockData) {
+    public boolean receiveNextData(BlockData blockData) {
         synchronized (lockData) {
+            if (lastAcceptedBlockDataId >= blockData.getId()) return false;
+            lastAcceptedBlockDataId = blockData.getId();
             this.newData.add(blockData);
             if (switcher) {
                 swapData();
                 createDataForNewBlock();
                 switcher = false;
             }
+            return true;
         }
     }
 
@@ -138,9 +142,9 @@ public class Blockchain implements BlockchainInterface, Serializable {
         if (block == null || block.data == null || block.data.isEmpty()) return false;
         //check id(s)
         long[] ids = getSortedIds(block.data);
-        if ((maxPrevBlockDataId + 1) != ids[0]) return false;
+        if (maxPrevBlockDataId >= ids[0]) return false;
         for (int i = 1; i < ids.length; i++) {
-            if ((ids[i - 1] + 1) != ids[i]) return false;
+            if (ids[i - 1] >= ids[i]) return false;
         }
         //check numOfZeros, hash, signature(s)
         return Utils.startsWithZeros(block.hashOfThis, numOfZeros) && hashOfPrev.equals(block.hashOfPrev) && checkSignatures(block.data);
@@ -182,7 +186,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
 
         if (ids[0] != 0) return false;
         for (int i = 1; i < ids.length; i++) {
-            if ((ids[i - 1] + 1) != ids[i]) return false;
+            if (ids[i - 1] >= ids[i]) return false;
         }
         //check signature(s)
         for (Block block : blocks) {
