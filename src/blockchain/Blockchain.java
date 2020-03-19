@@ -4,13 +4,14 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.LongStream;
 
 public class Blockchain implements BlockchainInterface, Serializable {
     private List<Block> blocks;
     private List<String> hashes;
     private long coins = 999_999_999;
-    private transient List<Observer> observers = new ArrayList<>();
+    private transient List<Observer> observers = new CopyOnWriteArrayList<>();
     private final Lock lockData = new Lock();
     private final Lock lockBlockDataId = new Lock();
     private final Lock lockReceiveNextBlock = new Lock();
@@ -272,7 +273,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
         if (isBlockchainHacked()) {
             throw new RuntimeException("Block hash does NOT match");
         }
-        observers = new ArrayList<>();
+        observers = new CopyOnWriteArrayList<>();
         switcher = true;
     }
 
