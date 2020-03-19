@@ -12,7 +12,7 @@ public class Miner {
 
     public Miner(BlockchainInterface blockchain, long numOfBlocks) {
         this.blockchain = blockchain;
-        this.numOfBlocks = numOfBlocks;
+        this.numOfBlocks = numOfBlocks < 0 ? -1 : numOfBlocks;
         minerName = "miner #" + id;
         generateBlock(); // mineBlock
     }
@@ -23,7 +23,8 @@ public class Miner {
         long endTime;
         Object[] data;
 
-        for (int i = 0; i < numOfBlocks; i++) {
+        int i = numOfBlocks == -1 ? -2 : 0; // if numOfBlocks == -1 mine blocks infinitely
+        while (i < numOfBlocks) {
             while ((data = blockchain.getDataForNewBlock()) == null) {
                 Thread.yield();
             }
@@ -33,6 +34,8 @@ public class Miner {
             endTime = System.currentTimeMillis();
 
             coins += sendBlock(thisBlock, endTime - startTime, id);
+
+            if (numOfBlocks != -1) i++;
         }
     }
 
