@@ -156,7 +156,9 @@ public class Blockchain implements BlockchainInterface, Serializable {
 
     @Override
     public boolean isBlockchainHacked() {
-        return !isBlockchainValid(blocks, hashes);
+        synchronized (lockReceiveNextBlock) {
+            return !isBlockchainValid(blocks, hashes);
+        }
     }
 
     private static boolean isBlockchainValid(List<Block> blocks, List<String> hashes) {
@@ -196,7 +198,9 @@ public class Blockchain implements BlockchainInterface, Serializable {
 
     @Override
     public long countUserCoins(String userName) {
-        return countUserCoins(blocks, userName, minerGetsVC);
+        synchronized (lockReceiveNextBlock) {
+            return countUserCoins(blocks, userName, minerGetsVC);
+        }
     }
 
     private long countUserCoins(List<Block> blocks, String userName, long blockPrice) {
