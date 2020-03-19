@@ -75,9 +75,13 @@ public class Blockchain implements BlockchainInterface, Serializable {
             }
 
             try {
-                SerializationUtils.serialize(this, "src/blockchain/data.txt");
+                synchronized (lockData) {
+                    synchronized (lockBlockDataId) {
+                        SerializationUtils.serialize(this, "src/blockchain/data.txt");
+                    }
+                }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
             notifyObservers();
             switcher = true;
