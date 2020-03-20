@@ -179,7 +179,14 @@ public class Blockchain implements BlockchainInterface, Serializable {
         for (int i = 0; i < hashes.size(); i++) {
             Block block = blocks.get(i);
             if (block == null || block.data == null || block.data.isEmpty()) return false;
+            // check hashOfThis
             if (!hashes.get(i).equals(block.hashOfThis)) return false;
+            // check hasOfPrev
+            if (i != 0) {
+                if (!hashes.get(i - 1).equals(block.hashOfPrev)) return false;
+            } else {
+                if (!"0".equals(block.hashOfPrev)) return false;
+            }
         }
         // check BlockData id
         long[] ids = blocks.stream()
@@ -224,7 +231,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
             throw new IllegalArgumentException();
         if (blocks.isEmpty()) return 0;
 
-        Set<BlockData> combinedBlockData = new HashSet<>(); // Set handles situation if swapData was not called write after block was added
+        Set<BlockData> combinedBlockData = new HashSet<>();
         combinedBlockData.addAll(oldData);
         combinedBlockData.addAll(newData);
         combinedBlockData.addAll(blocks.stream().flatMap(block -> block.data.stream()).collect(Collectors.toList()));
