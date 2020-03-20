@@ -3,8 +3,11 @@ package blockchain;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 public class Blockchain implements BlockchainInterface, Serializable {
@@ -208,28 +211,35 @@ public class Blockchain implements BlockchainInterface, Serializable {
     @Override
     public long countUserCoins(String userName) {
         synchronized (lockReceiveNextBlock) {
-            return countUserCoins(blocks, userName, minerGetsVC);
+            synchronized (lockData) {
+                synchronized (lockBlockDataId) {
+                    return countUserCoins(blocks, userName, oldData, newData, minerGetsVC);
+                }
+            }
         }
     }
 
-    private long countUserCoins(List<Block> blocks, String userName, long blockPrice) {
+    private long countUserCoins(List<Block> blocks, String userName, List<BlockData> oldData, List<BlockData> newData, long blockPrice) {
         if (userName == null || userName.isEmpty() || blocks == null || blockPrice <= 0)
             throw new IllegalArgumentException();
         if (blocks.isEmpty()) return 0;
 
-        long receivedCoins = blocks.stream()
-                .flatMap(block -> block.data.stream())
+        Set<BlockData> combinedBlockData = new HashSet<>(); // Set handles situation if swapData was not called write after block was added
+        combinedBlockData.addAll(oldData);
+        combinedBlockData.addAll(newData);
+        combinedBlockData.addAll(blocks.stream().flatMap(block -> block.data.stream()).collect(Collectors.toList()));
+
+        long receivedCoins = combinedBlockData.stream()
                 .filter(d -> d.getData().endsWith("\n" + userName))
-                .mapToLong(d -> Integer.parseInt(d.getData().substring(d.getData().indexOf("\n") + 1, d.getData().lastIndexOf("\n"))))
+                .mapToLong(d -> Long.parseLong(d.getData().substring(d.getData().indexOf("\n") + 1, d.getData().lastIndexOf("\n"))))
                 .reduce(Long::sum)
                 .orElse(0);
         // if miner +coins for blocks
         receivedCoins += blocks.stream().filter(d -> d.createdBy.equals(userName)).count() * blockPrice;
 
-        long sentCoins = blocks.stream()
-                .flatMap(block -> block.data.stream())
+        long sentCoins = combinedBlockData.stream()
                 .filter(d -> d.getData().startsWith(userName + "\n"))
-                .mapToLong(d -> Integer.parseInt(d.getData().substring(d.getData().indexOf("\n") + 1, d.getData().lastIndexOf("\n"))))
+                .mapToLong(d -> Long.parseLong(d.getData().substring(d.getData().indexOf("\n") + 1, d.getData().lastIndexOf("\n"))))
                 .reduce(Long::sum)
                 .orElse(0);
 
