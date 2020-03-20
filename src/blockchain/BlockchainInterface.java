@@ -4,7 +4,7 @@ public interface BlockchainInterface {
 
     void initialize(int numOfZeros);
 
-    long receiveNextBlock(Block block, long blockTime, long minerId);
+    void receiveNextBlock(Block block, long blockTime);
 
     boolean receiveNextData(BlockData data);
 

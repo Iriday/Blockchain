@@ -13,7 +13,7 @@ import java.util.stream.LongStream;
 public class Blockchain implements BlockchainInterface, Serializable {
     private List<Block> blocks;
     private List<String> hashes;
-    private long coins = 999_999_999;
+    // private long coins = 999_999_999;
     private transient List<Observer> observers = new CopyOnWriteArrayList<>();
     private final Lock lockData = new Lock();
     private final Lock lockBlockDataId = new Lock();
@@ -29,7 +29,6 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private volatile String hashOfPrev = "0";
     private Block thisBlock;
     private long blockTime;
-    private long minerId;
     private final BlockData NO_DATA = Transaction.getEmptyData();
     private long currentBlockDataId = 0;
     private volatile boolean switcher = false;
@@ -51,20 +50,19 @@ public class Blockchain implements BlockchainInterface, Serializable {
     }
 
     @Override
-    public long receiveNextBlock(Block block, long blockTime, long minerId) {
+    public void receiveNextBlock(Block block, long blockTime) {
         synchronized (lockReceiveNextBlock) {
-            if (!isBlockValid(block, maxPrevBlockDataId, numOfZeros, hashOfPrev)) return 0;
+            if (!isBlockValid(block, maxPrevBlockDataId, numOfZeros, hashOfPrev)) return ;
 
             try {
                 block.setUnmodifiableId(++idCounter);
             } catch (Exception e) {
                 --idCounter;
-                return 0;
+                return ;
             }
 
             this.thisBlock = block;
             this.blockTime = blockTime;
-            this.minerId = minerId;
 
             blocks.add(thisBlock);
             hashes.add(thisBlock.hashOfThis);
@@ -89,8 +87,6 @@ public class Blockchain implements BlockchainInterface, Serializable {
             }
             notifyObservers();
             switcher = true;
-            coins -= 100;
-            return minerGetsVC;
         }
     }
 

@@ -10,7 +10,6 @@ public class Miner {
     private static long ids = 0;
     public final long id = ++ids;
     private final String name;
-    private long coins = 0;
     private KeyPair keyPair;
 
     public Miner(BlockchainInterface blockchain, long numOfBlocks) {
@@ -50,7 +49,7 @@ public class Miner {
             thisBlock = createBlock((String) data[0], (List<BlockData>) data[1], (int) data[2], name);
             endTime = System.currentTimeMillis();
 
-            coins += sendBlock(thisBlock, endTime - startTime, id);
+             blockchain.receiveNextBlock(thisBlock, endTime - startTime);
 
             if (numOfBlocks != -1) i++;
         }
@@ -58,9 +57,5 @@ public class Miner {
 
     private static Block createBlock(String hashOfPrev, List<BlockData> data, int numOfZeros, String createdBy) {
         return new Block(hashOfPrev, data, numOfZeros, createdBy);
-    }
-
-    private long sendBlock(Block block, long blockTime, long id) {
-        return blockchain.receiveNextBlock(block, blockTime, id);
     }
 }
