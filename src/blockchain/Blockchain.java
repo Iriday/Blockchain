@@ -30,7 +30,7 @@ public class Blockchain implements BlockchainInterface, Serializable {
     private Block thisBlock;
     private long blockTime;
     private long minerId;
-    private final BlockData NO_DATA = Message.getEmptyData();
+    private final BlockData NO_DATA = Transaction.getEmptyData();
     private long currentBlockDataId = 0;
     private volatile boolean switcher = false;
     private long maxPrevBlockDataId = -1;

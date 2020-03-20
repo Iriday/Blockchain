@@ -13,6 +13,7 @@ public class Client {
     public Client(String name, BlockchainInterface blockchain) {
         this.blockchain = blockchain;
         this.name = name;
+        Clients.addClient(name);
         try {
             keyPair = SignatureUtils.generateKeys();
         } catch (Exception e) {
@@ -24,13 +25,20 @@ public class Client {
         online = true;
         while (online) {
             try {
-                Thread.sleep(rand.nextInt(25000) + 100);
+                Thread.sleep(rand.nextInt(500) + 100);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            String message = generateMessage(name);
 
-            while (!blockchain.receiveNextData(new Message(message, blockchain.getNextBlockDataId(), keyPair))) ;
+            long coinsToSend = rand.nextInt(100) + 1;
+            long hasCoins = blockchain.countUserCoins(name);
+            if (hasCoins >= coinsToSend) {
+                String randReceiver = Clients.getRandClientExceptThis(name);
+                while (!blockchain.receiveNextData(new Transaction(blockchain.getNextBlockDataId(), name, coinsToSend, randReceiver, keyPair)))
+                    ;
+            }
+            // String message = generateMessage(name);
+            // while (!blockchain.receiveNextData(new Message(message, blockchain.getNextBlockDataId(), keyPair))) ;
         }
     }
 
