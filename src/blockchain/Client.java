@@ -7,7 +7,7 @@ public class Client {
     private static final Random rand = new Random();
     private final BlockchainInterface blockchain;
     private final String name;
-    private boolean online = false;
+    private volatile boolean online = false;
     private final KeyPair keyPair;
 
     public Client(String name, BlockchainInterface blockchain) {
